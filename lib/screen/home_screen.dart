@@ -42,8 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     print(userDataController.getX());
-    // print(userDataController.displayName);
-    // print(userDataController.password);
     return Localizations(
       locale: const Locale('en', 'US'),
       delegates: const <LocalizationsDelegate<dynamic>>[
@@ -87,12 +85,9 @@ class _HomeScreenState extends State<HomeScreen> {
           // textDirection: TextDirection.ltr,
         ),
       ),
-    //   leading: _img!=null? CircleAvatar(
-    //   radius: 60,
-    //   backgroundImage: MemoryImage(_img!),
-    // ): const Icon(Icons.account_circle,color: Colors.white,),
+
       leading: Padding(
-        padding: EdgeInsets.only(left: 15),
+        padding: const EdgeInsets.only(left: 15),
         child: GetBuilder<UserDataController>(
           builder: (controller) {
             // Lấy hình ảnh từ controller

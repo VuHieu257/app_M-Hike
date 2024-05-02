@@ -64,40 +64,31 @@ class _AccountPageState extends State<AccountPage> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        _img!=null?  Container(
-                          height: height*0.18,
-                          width: height*0.18,
-                          decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(100)),
-                              boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                    color: const Color(0xFF00B6F0)
-                                        .withOpacity(0.5),
-                                    offset: const Offset(1.1, 1.1),
-                                    blurRadius: 10.0),
-                              ],
-                              image:DecorationImage(
-                                  image: MemoryImage(_img!),
-                                  // image: MemoryImage(userDataController.getX()),
-                                  fit: BoxFit.fill
-                              ) ),
-                        ):
-                        Container(
-                          height: height*0.18,
-                          width: height*0.18,
-                          decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(100)),
-                              boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                    color: const Color(0xFF00B6F0)
-                                        .withOpacity(0.5),
-                                    offset: const Offset(1.1, 1.1),
-                                    blurRadius: 10.0),
-                              ],
-                              image:const DecorationImage(
-                                  image: AssetImage("assets/images/avatar.png"),
-                                  fit: BoxFit.fill
-                              ) ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: GetBuilder<UserDataController>(
+                            builder: (controller) {
+                              // Lấy hình ảnh từ controller
+                              Uint8List? imageData = controller.getX();
+                              // Kiểm tra xem imageData có dữ liệu không
+                              if (imageData != null) {
+                                // Nếu có dữ liệu, hiển thị hình ảnh
+                                return SizedBox(
+                                  height: height*0.18,
+                                  width: height*0.18,
+                                  child: CircleAvatar(
+                                      radius: 60,
+                                      backgroundImage: MemoryImage(imageData)),
+                                );
+                              } else {
+                                // Nếu không có dữ liệu, hiển thị một thông báo hoặc widget khác
+                                return const CircleAvatar(
+                                  radius: 60,
+                                  backgroundImage: AssetImage("assets/images/avatar.png"),
+                                );
+                              }
+                            },
+                          ),
                         ),
                         Positioned(
                           right: 10,
@@ -178,22 +169,31 @@ class _AccountPageState extends State<AccountPage> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        Container(
-                          height: height*0.18,
-                          width: height*0.18,
-                          decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(100)),
-                              boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                    color: const Color(0xFF00B6F0)
-                                        .withOpacity(0.5),
-                                    offset: const Offset(1.1, 1.1),
-                                    blurRadius: 10.0),
-                              ],
-                              image:const DecorationImage(
-                                  image: AssetImage("assets/images/all_myorder.png"),
-                                  fit: BoxFit.fill
-                              ) ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: GetBuilder<UserDataController>(
+                            builder: (controller) {
+                              // Lấy hình ảnh từ controller
+                              Uint8List? imageData = controller.getX();
+                              // Kiểm tra xem imageData có dữ liệu không
+                              if (imageData != null) {
+                                // Nếu có dữ liệu, hiển thị hình ảnh
+                                return SizedBox(
+                                  height: height*0.18,
+                                  width: height*0.18,
+                                  child: CircleAvatar(
+                                      radius: 60,
+                                      backgroundImage: MemoryImage(imageData)),
+                                );
+                              } else {
+                                // Nếu không có dữ liệu, hiển thị một thông báo hoặc widget khác
+                                return const CircleAvatar(
+                                  radius: 60,
+                                  backgroundImage: AssetImage("assets/images/avatar.png"),
+                                );
+                              }
+                            },
+                          ),
                         ),
                         Positioned(
                           right: 10,
@@ -204,7 +204,7 @@ class _AccountPageState extends State<AccountPage> {
                               color: Colors.amber,
                               borderRadius: BorderRadius.all(Radius.circular(50)),
                             ),
-                            child: const Icon(Icons.camera_alt_outlined),
+                            child: const Icon(Icons.add_a_photo_outlined),
                           ),
                         ),
                       ],
