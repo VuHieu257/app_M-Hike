@@ -29,11 +29,11 @@ class _RegisterAcountState extends State<SignUpScreen> {
   bool obscurrentText = true;
   bool obscurrentTextVerify = true;
   bool isSigningUp = false;
+  String validEmail="";
   String validPassword="";
 
   final user = FirebaseAuth.instance.currentUser;
 
-  // final FirebaseAuthService _auth = FirebaseAuthService();
   @override
   void dispose() {
     // TODO: implement dispose
@@ -115,7 +115,11 @@ class _RegisterAcountState extends State<SignUpScreen> {
                                           child: SizedBox(
                                             width: width*0.85,
                                             child: TextFormField(
-                                              validator:(value) => EmailValidator.validate(value!) ? null : "Please enter a valid email",
+                                              validator:(value) =>
+                                              EmailValidator.validate(value!) ?
+                                              // (validEmail?null:"Email already exists. Please use another email.")
+                                              (validEmail=="The email address is already in use by another account."? validEmail : null)
+                                                  : "Please enter a valid email",
                                               keyboardType: TextInputType.emailAddress,
                                               controller: _userEmailController,
                                               decoration: const InputDecoration(
@@ -136,7 +140,7 @@ class _RegisterAcountState extends State<SignUpScreen> {
                                           child: SizedBox(
                                             width: width*0.85,
                                             child: TextFormField(
-                                              validator:(value) => validPassword=="The password provided is too weak" ? validPassword :"The password provided is too weak",
+                                              validator:(value) =>(value!.length >= 8 && value!.length<=24)?(validPassword=="The password provided is too weak"? validPassword :null):"Enter a password greater than 8 and less than 24",
                                               keyboardType: TextInputType.emailAddress,
                                               controller: _userPasswordController,
                                               obscureText: obscurrentText,
@@ -146,7 +150,7 @@ class _RegisterAcountState extends State<SignUpScreen> {
                                                   borderSide: BorderSide(width: 1),
                                                   borderRadius: BorderRadius.all(Radius.circular(15)),
                                                 ),
-                                                prefixIcon: Icon(Icons.lock_outline,size: 30,),
+                                                prefixIcon: const Icon(Icons.lock_outline,size: 30,),
                                                 hintText: "Enter Password",
                                                 labelText: "Password",
                                                 suffixIcon: GestureDetector(
@@ -198,46 +202,48 @@ class _RegisterAcountState extends State<SignUpScreen> {
                                   InkWell(
                                     splashColor: Colors.transparent,
                                     onTap: () async {
+                                      final message = await AuthService().registration(
+                                        email: _userEmailController.text,
+                                        password: _userPasswordController.text,
+                                      );
+                                      setState(() {
+                                        validPassword = message!;
+                                        validEmail = message;
+                                      });
                                       if(_formKey.currentState!.validate()){
-                                        final message = await AuthService().registration(
-                                          email: _userEmailController.text,
-                                          password: _userPasswordController.text,
-                                        );
-                                        if (message!.contains('Success')) {
+                                        if (message!.contains("The account already exists for that email.") ||
+                                            message.contains("The password provided is too weak.")) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(message),
+                                            ),
+                                          );
+                                        } else if (message.contains('Success')) {
                                           Navigator.of(context).pushReplacement(
                                               MaterialPageRoute(builder: (context) => const SignInScreen()));
+                                          UserData user = UserData(
+                                            displayName: _userNameController.text,
+                                            email: _userEmailController.text,
+                                            password: _userPasswordController.text,
+                                          );
+                                          _databaseService.addUserData(user);
                                         }
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(message),
-                                          ),
-                                        );
-                                        setState(() {
-                                          validPassword=message;
-                                        });
-                                        UserData user=UserData(
-                                          displayName:_userNameController.text,
-                                          email: _userEmailController.text,
-                                          password:_userPasswordController.text,
-                                        );
-                                        _databaseService.addUserData(user);
                                       }
                                     },
                                     child: Container(
-                                      height:height*0.06,
-                                      margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 35),
+                                      height: height * 0.06,
+                                      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 35),
                                       decoration: BoxDecoration(
-                                        // color: Color(0xFF00B6F0),
                                         color: Theme.of(context).colorScheme.primary,
                                         borderRadius: const BorderRadius.all(
                                           Radius.circular(16.0),
                                         ),
                                         boxShadow: <BoxShadow>[
                                           BoxShadow(
-                                              color: Theme.of(context).colorScheme.primary
-                                                  .withOpacity(0.5),
-                                              offset: const Offset(1.1, 1.1),
-                                              blurRadius: 10.0),
+                                            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                                            offset: const Offset(1.1, 1.1),
+                                            blurRadius: 10.0,
+                                          ),
                                         ],
                                       ),
                                       child: const Center(
@@ -254,6 +260,7 @@ class _RegisterAcountState extends State<SignUpScreen> {
                                       ),
                                     ),
                                   ),
+
                                 ],
                               ),
                             ),
@@ -294,27 +301,4 @@ class _RegisterAcountState extends State<SignUpScreen> {
       ),
     );
   }
-  // Padding customTextFormField(double width,String validate,TextEditingController _controller,IconData icon,String title){
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical:8.0),
-  //     child: SizedBox(
-  //       width: width*0.85,
-  //       child: TextFormField(
-  //         validator:validate,
-  //         keyboardType: TextInputType.emailAddress,
-  //         controller: _controller,
-  //         decoration: InputDecoration(
-  //           alignLabelWithHint: true,
-  //           border: const OutlineInputBorder(
-  //             borderSide: BorderSide(width: 1),
-  //             borderRadius: BorderRadius.all(Radius.circular(15)),
-  //           ),
-  //           prefixIcon: Icon(icon,size: 30,),
-  //           hintText: "Enter $title",
-  //           labelText: title,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 }

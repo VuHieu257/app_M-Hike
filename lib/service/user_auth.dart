@@ -3,21 +3,48 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 class AuthService {
+  // Future<String?> registration({
+  //   required String email,
+  //   required String password,
+  // }) async {
+  //   try {
+  //     await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  //       email: email,
+  //       password: password,
+  //     );
+  //     return 'Success';
+  //   } on FirebaseAuthException catch (e) {
+  //     if (e.code == 'weak-password') {
+  //       return 'The password provided is too weak.';
+  //     } else if (e.code == 'email-already-in-use') {
+  //       return 'The account already exists for that email.';
+  //     } else {
+  //       return e.message;
+  //     }
+  //   } catch (e) {
+  //     return e.toString();
+  //   }
+  // }
   Future<String?> registration({
     required String email,
     required String password,
   }) async {
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return 'Success';
+      final methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      if (methods.isNotEmpty) {
+        // Email đã được sử dụng cho việc đăng ký
+        return 'The account already exists for that email.';
+      } else {
+        // Email chưa được sử dụng, tiến hành tạo tài khoản mới
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        return 'Success';
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         return 'The password provided is too weak.';
-      } else if (e.code == 'email-already-in-use') {
-        return 'The account already exists for that email.';
       } else {
         return e.message;
       }
